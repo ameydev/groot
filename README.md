@@ -1,10 +1,10 @@
 # groot
-kubernetes helper utility cli tool for finding out the k8s resources in the cluster and show them in mapped with each other
+kubernetes helper tool for finding out status of a kubernetes resource with their respective linked resources in a cluster.
 
-It should give the overview of all(or some in case we input the list of it having CRDs) the resources, showing
+It will print the following information about the resource queried:
   - Status of the resource
-  - mappings/relations with each other. etc
-eg. 
+  - Mappings/relations with other resources.
+eg:
 
 ```
 $ ktree -n dev
