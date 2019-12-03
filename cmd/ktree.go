@@ -23,10 +23,11 @@ import (
 
 	"os/user"
 
+	"github.com/ameydev/groot/ksearch"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -35,10 +36,9 @@ import (
 
 var indentationCount int = 1
 var indentation string
-
-// func initindentationCount() {
-// 	indentationCount = 1
-// }
+var pods v1.PodList
+var deployments appsv1.DeploymentList
+var services v1.ServiceList
 
 type configs struct {
 	Namespace  string
@@ -109,29 +109,18 @@ func initConfig(c *configs) error {
 }
 
 func getOverView(c *configs) error {
-	// var contextName string
-	// initIndentation()
 	config, err := clientcmd.BuildConfigFromFlags("", c.KubeConfig)
 	if err != nil {
-		// log.Info("There was an error getting the config from c.KubeConfig.")
 		return err
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		// log.Info("There was an error getting clientset from config")
 		return err
 	}
 
-	// contextName = clientcmd.getContextName()
 	fmt.Println("Namespace : " + c.Namespace + " \n ")
-	pods, err := clientset.CoreV1().Pods(c.Namespace).List(metav1.ListOptions{})
-	if err != nil {
-		// log.Info("There was an error getting the pod from clientset", err)
-		return err
-	}
-
-	printPodDetails(pods)
+	ksearch.SearchResources(clientset, &c.Namespace)
 
 	return nil
 }
@@ -149,25 +138,4 @@ func getKubeConfig() string {
 		kubeconfig = usr.HomeDir + "/.kube/config"
 	}
 	return kubeconfig
-}
-
-func getIndentation(ind int) string {
-
-	indentation = ""
-	for i := 0; i < ind; i++ {
-		indentation += "\t"
-	}
-	indentationCount += 1
-	return indentation
-
-}
-func printPodDetails(pods *v1.PodList) {
-	// fmt.Printf("\nPods\n----\n")
-	// w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
-	// fmt.Fprintf(w, "%v\t%v\t%v\t%v\n", "NAME", "READY", "STATUS", "RESTARTS")
-
-	for _, pod := range pods.Items {
-		fmt.Println(getIndentation(indentationCount)+"- Pods - "+pod.Name, "", pod.Status.Phase, "")
-	}
-	// w.Flush()
 }

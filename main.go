@@ -18,7 +18,7 @@ package main
 import (
 	"os"
 
-	"github.com/ameydev/ktree/cmd"
+	"github.com/ameydev/groot/cmd"
 )
 
 func main() {

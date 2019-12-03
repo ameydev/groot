@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  name = "github.com/apex/log"
-  packages = ["."]
-  revision = "295021f518f737dd0bfdca2c98136517703196b9"
-  version = "v1.1.1"
-
-[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
@@ -68,6 +62,12 @@
   version = "v1.1.8"
 
 [[projects]]
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
+  version = "v1.0.2"
+
+[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "de8848e004dd33dc07a2947b3d76f618a7fc7ef1"
@@ -104,10 +104,10 @@
   version = "v1.6.0"
 
 [[projects]]
-  name = "github.com/pkg/errors"
+  name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
-  version = "v0.8.1"
+  revision = "839c75faf7f98a33d445d181f3018b5c3409a45e"
+  version = "v1.4.2"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -244,6 +244,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5816d0459d312593744488221d94c9334e4f00da1f02d52f10fc322eb50e587a"
+  inputs-digest = "97c5c6fe21581051c29b2948dce815cf67f9862c159b6be3ccfe5820eda382ba"
   solver-name = "gps-cdcl"
   solver-version = 1
