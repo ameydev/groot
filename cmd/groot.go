@@ -23,7 +23,8 @@ import (
 
 	"os/user"
 
-	"github.com/ameydev/groot/ksearch"
+	// "github.com/ameydev/groot/ksearch"
+	"github.com/ameydev/groot/kmap"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 	appsv1 "k8s.io/api/apps/v1"
@@ -46,10 +47,10 @@ type configs struct {
 }
 
 func Execute() error {
-	return ktree().Execute()
+	return groot().Execute()
 }
 
-func ktree() *cobra.Command {
+func groot() *cobra.Command {
 
 	c := &configs{
 		Namespace:  "default",
@@ -57,11 +58,11 @@ func ktree() *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:   "ktree",
-		Short: "ktree is a k8s helper CLI utility tool.",
+		Use:   "groot",
+		Short: "groot is a k8s helper CLI utility tool.",
 		Long: `This tool is used to find k8s resourses and their mappings with other k8s reources. For example:
 		  
-		ktree -n dev.`,
+		groot -n $namespace.`,
 		PreRunE: func(cobracmd *cobra.Command, _ []string) error {
 			// load current kube-config
 			return initConfig(c)
@@ -93,9 +94,9 @@ func initConfig(c *configs) error {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".ktree" (without extension).
+		// Search config in home directory with name ".groot" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".ktree")
+		viper.SetConfigName(".groot")
 
 	}
 
@@ -120,7 +121,8 @@ func getOverView(c *configs) error {
 	}
 
 	fmt.Println("Namespace : " + c.Namespace + " \n ")
-	ksearch.SearchResources(clientset, &c.Namespace)
+	// ksearch.SearchResources(clientset, &c.Namespace)
+	kmap.FindThemAll(clientset, &c.Namespace)
 
 	return nil
 }
