@@ -14,9 +14,11 @@ type Resource struct {
 	info           map[string]string
 	children       []*Resource
 	parent         *Resource
-	labels         map[string]string
+	Labels         map[string]string
 	selector       map[string]string
 	ownerReference []string
+	spec           v1.PodSpec
+	hasParent      bool
 }
 
 type ResourcePool struct {
@@ -143,19 +145,12 @@ func addPodDetails(pods *v1.PodList, rPool *ResourcePool) *ResourcePool {
 	if len(pods.Items) > 0 {
 
 		for _, pod := range pods.Items {
-			// if resName != "" {
-			// 	if strings.Contains(pod.Name, resName) {
-			// 		fmt.Faddf(w, "%v\t%v\t%v\t%v\n", pod.Name, "", pod.Status.Phase, "")
-			// 	}
-			// } else {
-			// 	fmt.Faddf(w, "%v\t%v\t%v\t%v\n", pod.Name, "", pod.Status.Phase, "")
-			// }
 			var podResource Resource
 			podResource.name = pod.Name
 			podResource.kind = "Pod"
 			podResource.status = string(pod.Status.Phase)
-			podResource.labels = pod.Labels
-
+			podResource.Labels = pod.Labels
+			podResource.spec = pod.Spec
 			rPool.addToResourcePool(&podResource)
 		}
 
@@ -169,7 +164,7 @@ func addPodTemplates(podTemplates *v1.PodTemplateList, rPool *ResourcePool) *Res
 			podTemplateResource.name = podTemplate.Name
 			podTemplateResource.kind = "PodTemplate"
 			// podTemplateResource.status = string(podTemplate.s)
-			podTemplateResource.labels = podTemplate.Labels
+			podTemplateResource.Labels = podTemplate.Labels
 
 			rPool.addToResourcePool(&podTemplateResource)
 
@@ -192,7 +187,7 @@ func addComponentStatuses(componentStatuses *v1.ComponentStatusList, rPool *Reso
 			podTemplateResource.name = componentStatus.Name
 			podTemplateResource.kind = "ComponentStatus"
 			// podTemplateResource.status = string(podTemplate.s)
-			podTemplateResource.labels = componentStatus.Labels
+			podTemplateResource.Labels = componentStatus.Labels
 
 			rPool.addToResourcePool(&podTemplateResource)
 
@@ -215,7 +210,7 @@ func addConfigMaps(cms *v1.ConfigMapList, rPool *ResourcePool) *ResourcePool {
 			blankResource.name = configMap.Name
 			blankResource.kind = "ConfigMap"
 			// blankResource.status = string(configMap.s)
-			blankResource.labels = configMap.Labels
+			blankResource.Labels = configMap.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 
@@ -238,7 +233,7 @@ func addEndpoints(endPoints *v1.EndpointsList, rPool *ResourcePool) *ResourcePoo
 			blankResource.name = endpoint.Name
 			blankResource.kind = "Endpoint"
 			// blankResource.status = string(configMap.s)
-			blankResource.labels = endpoint.Labels
+			blankResource.Labels = endpoint.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -255,7 +250,7 @@ func addEvents(events *v1.EventList, rPool *ResourcePool) *ResourcePool {
 			blankResource.name = event.Name
 			blankResource.kind = "Event"
 			// blankResource.status = string(configMap.s)
-			blankResource.labels = event.Labels
+			blankResource.Labels = event.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -279,7 +274,7 @@ func addLimitRanges(limitRanges *v1.LimitRangeList, rPool *ResourcePool) *Resour
 			blankResource.name = limitRange.Name
 			blankResource.kind = "LimitRange"
 			// blankResource.status = string(configMap.s)
-			blankResource.labels = limitRange.Labels
+			blankResource.Labels = limitRange.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -302,7 +297,7 @@ func addNamespaces(namespaces *v1.NamespaceList, rPool *ResourcePool) *ResourceP
 			blankResource.name = namespace.Name
 			blankResource.kind = "Namespace"
 			// blankResource.status = string(configMap.s)
-			blankResource.labels = namespace.Labels
+			blankResource.Labels = namespace.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -325,7 +320,7 @@ func addPVs(pvs *v1.PersistentVolumeList, rPool *ResourcePool) *ResourcePool {
 			blankResource.name = pv.Name
 			blankResource.kind = "PersistentVolume"
 			blankResource.status = string(pv.Status.Phase)
-			blankResource.labels = pv.Labels
+			blankResource.Labels = pv.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -348,7 +343,7 @@ func addPVCs(pvcs *v1.PersistentVolumeClaimList, rPool *ResourcePool) *ResourceP
 			blankResource.name = pvc.Name
 			blankResource.kind = "PersistentVolumeClaim"
 			blankResource.status = string(pvc.Status.Phase)
-			blankResource.labels = pvc.Labels
+			blankResource.Labels = pvc.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -372,7 +367,7 @@ func addResourceQuotas(resQuotas *v1.ResourceQuotaList, rPool *ResourcePool) *Re
 			blankResource.name = resQ.Name
 			blankResource.kind = "ResourceQuota"
 			// blankResource.status = string(resQ.Status)
-			blankResource.labels = resQ.Labels
+			blankResource.Labels = resQ.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -394,7 +389,7 @@ func addSecrets(secrets *v1.SecretList, rPool *ResourcePool) *ResourcePool {
 			blankResource.name = secret.Name
 			blankResource.kind = "Secret"
 			// blankResource.status = string(secret.Status.Phase)
-			blankResource.labels = secret.Labels
+			blankResource.Labels = secret.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -417,7 +412,7 @@ func addServices(services *v1.ServiceList, rPool *ResourcePool) *ResourcePool {
 			blankResource.name = service.Name
 			blankResource.kind = "Service"
 			// blankResource.status = string(service.Status.)
-			blankResource.labels = service.Labels
+			blankResource.Labels = service.Labels
 			blankResource.selector = service.Spec.Selector
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
@@ -440,7 +435,7 @@ func addServiceAccounts(serviceAccs *v1.ServiceAccountList, rPool *ResourcePool)
 			blankResource.name = serviceAcc.Name
 			blankResource.kind = "ServiceAccount"
 			// blankResource.status = string(resQ.Status)
-			blankResource.labels = serviceAcc.Labels
+			blankResource.Labels = serviceAcc.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -463,7 +458,7 @@ func addDaemonSets(daemonsets *appsv1.DaemonSetList, rPool *ResourcePool) *Resou
 			blankResource.name = ds.Name
 			blankResource.kind = "DaemonSet"
 			blankResource.status = string(ds.Status.NumberReady) + "/" + string(ds.Status.DesiredNumberScheduled)
-			blankResource.labels = ds.Labels
+			blankResource.Labels = ds.Labels
 			blankResource.selector = ds.Spec.Selector.MatchLabels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
@@ -486,7 +481,7 @@ func addDeployments(deployments *appsv1.DeploymentList, rPool *ResourcePool) *Re
 			blankResource.name = deployment.Name
 			blankResource.kind = "Deployment"
 			blankResource.status = string(deployment.Status.ReadyReplicas) + "/" + string(deployment.Status.AvailableReplicas)
-			blankResource.labels = deployment.Labels
+			blankResource.Labels = deployment.Labels
 			blankResource.selector = deployment.Spec.Selector.MatchLabels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
@@ -509,7 +504,7 @@ func addReplicaSets(rsets *appsv1.ReplicaSetList, rPool *ResourcePool) *Resource
 			blankResource.name = rs.Name
 			blankResource.kind = "Replicaset"
 			// blankResource.status = string(rs.Status.ReadyReplicas) + "/" + string(rs.Status.CurrentReplicas)
-			blankResource.labels = rs.Labels
+			blankResource.Labels = rs.Labels
 			blankResource.selector = rs.Spec.Selector.MatchLabels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
@@ -531,7 +526,7 @@ func addStateFulSets(ssets *appsv1.StatefulSetList, rPool *ResourcePool) *Resour
 			blankResource.name = sset.Name
 			blankResource.kind = "StatefulSet"
 			blankResource.status = string(sset.Status.ReadyReplicas) + "/" + string(sset.Status.CurrentReplicas)
-			blankResource.labels = sset.Labels
+			blankResource.Labels = sset.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -570,7 +565,7 @@ func addStateFulSets(ssets *appsv1.StatefulSetList, rPool *ResourcePool) *Resour
 // }
 
 // // // pods, err := clientset.CoreV1().Pods(c.Namespace).List(metav1.ListOptions{})
-// // func addDeployments(deployments *appsv1.DeploymentList, pods *v1.PodList) {
+// func addDeployments(deployments *appsv1.DeploymentList, pods *v1.PodList) {
 
 // 	for _, deployment := range deployments.Items {
 // 		// fmt.Faddf(w, "%v\t%v\t%v\t%v\t%v\n", deployment.Name, deployment.Status.ReadyReplicas, "", deployment.Status.AvailableReplicas, "")
