@@ -19,7 +19,7 @@ var indentation string
 
 func FindThemAll(clientset *kubernetes.Clientset, namespace *string) error {
 	// var kinds = "Pods,ComponentStatuses,ConfigMaps,Endpoints,LimitRanges,Namespaces,PersistentVolumes,PersistentVolumeClaims,PodTemplates,ResourceQuotas,Secrets,Services,ServiceAccounts,DaemonSets,Deployments,ReplicaSets,StatefulSets"
-	var kinds = "Services,Deployments,ReplicaSets,StatefulSets,PodTemplates,Pods,ConfigMaps,Endpoints,PersistentVolumes,PersistentVolumeClaims,Secrets,ServiceAccounts,DaemonSets"
+	var kinds = "Services,Endpoints,Deployments,ReplicaSets,StatefulSets,PodTemplates,Pods,ConfigMaps,PersistentVolumeClaims,PersistentVolumes,Secrets,ServiceAccounts,DaemonSets"
 
 	getter := make(chan interface{})
 
@@ -61,24 +61,35 @@ func mapThemAll(groot *Resource, rPool *ResourcePool) *Resource {
 		if resource.kind == "Deployment" && resource.parent == nil {
 			deploymentGroot, uPool := findDeployChildren(resource, rPool)
 			groot.children = append(groot.children, deploymentGroot)
+			resource.parent = groot
 			rPool = uPool
 
 		}
 		if resource.kind == "Replicaset" && resource.parent == nil {
 			rsGroot, uPool := findRSChildren(resource, rPool)
 			groot.children = append(groot.children, rsGroot)
+			resource.parent = groot
 			rPool = uPool
 
 		}
 		if resource.kind == "Pod" && resource.parent == nil {
 			podGroot, uPool := findPodChildren(resource, rPool)
 			groot.children = append(groot.children, podGroot)
+			resource.parent = groot
+			rPool = uPool
+
+		}
+		if resource.kind == "PersistentVolumeClaim" && resource.parent == nil {
+			pvcGroot, uPool := findPVCChildren(resource, rPool)
+			groot.children = append(groot.children, pvcGroot)
+			resource.parent = groot
 			rPool = uPool
 
 		}
 		if resource.kind != "Namespace" && resource.parent == nil {
 			groot.children = append(groot.children, resource)
-			indentationCount = 1
+			resource.parent = groot
+
 		} else {
 			// fmt.Println("The reource was namespace")
 			continue
@@ -130,20 +141,27 @@ func findPodChildren(pod *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 
 	for _, resource := range rPool.resources {
 
-		if resource.kind == "ConfigMap" || resource.kind == "Secret" || resource.kind == "PersistentVolumeClaim" {
+		if resource.kind == "ConfigMap" || resource.kind == "Secret" || resource.kind == "PersistentVolumeClaim" && (resource.parent != nil) {
 			for _, volume := range pod.spec.Volumes {
 				configMap := volume.VolumeSource.ConfigMap
 				if configMap != nil {
 					if volume.VolumeSource.ConfigMap.LocalObjectReference.Name == resource.name {
 						pod.children = append(pod.children, resource)
 						resource.parent = pod
+						break
 					}
 				}
 				pvc := volume.VolumeSource.PersistentVolumeClaim
 				if pvc != nil {
 					if volume.VolumeSource.PersistentVolumeClaim.ClaimName == resource.name {
+						// pod.children = append(pod.children, resource)
+						// resource.parent = pod
+						resource, uPool := findPVCChildren(resource, rPool)
 						pod.children = append(pod.children, resource)
 						resource.parent = pod
+						rPool = uPool
+						break
+
 					}
 				}
 				secret := volume.VolumeSource.Secret
@@ -151,6 +169,7 @@ func findPodChildren(pod *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 					if volume.VolumeSource.Secret.SecretName == resource.name {
 						pod.children = append(pod.children, resource)
 						resource.parent = pod
+						break
 					}
 				}
 			}
@@ -235,6 +254,7 @@ func findRSChildren(rs *Resource, rPool *ResourcePool) (*Resource, *ResourcePool
 						rs.children = append(rs.children, resource)
 						resource.parent = rs
 						rPool = uPool
+						break
 
 					}
 				}
@@ -243,4 +263,24 @@ func findRSChildren(rs *Resource, rPool *ResourcePool) (*Resource, *ResourcePool
 		}
 	}
 	return rs, rPool
+}
+
+func findPVCChildren(pvc *Resource, rPool *ResourcePool) (*Resource, *ResourcePool) {
+
+	for _, resource := range rPool.resources {
+
+		if resource.kind == "PersistentVolume" {
+
+			if pvc.info["Volume"] == resource.name {
+				// resource, uPool := findPodChildren(resource, rPool)
+				pvc.children = append(pvc.children, resource)
+				resource.parent = pvc
+				break
+				// rPool = uPool
+
+			}
+		}
+	}
+
+	return pvc, rPool
 }

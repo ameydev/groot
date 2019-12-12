@@ -321,6 +321,7 @@ func addPVs(pvs *v1.PersistentVolumeList, rPool *ResourcePool) *ResourcePool {
 			blankResource.kind = "PersistentVolume"
 			blankResource.status = string(pv.Status.Phase)
 			blankResource.Labels = pv.Labels
+
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
@@ -344,6 +345,10 @@ func addPVCs(pvcs *v1.PersistentVolumeClaimList, rPool *ResourcePool) *ResourceP
 			blankResource.kind = "PersistentVolumeClaim"
 			blankResource.status = string(pvc.Status.Phase)
 			blankResource.Labels = pvc.Labels
+			var data = map[string]string{}
+			data["Volume"] = pvc.Spec.VolumeName
+			// blankResource.info = {"Volume":pvc.Spec.VolumeName }
+			blankResource.info = data
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}
