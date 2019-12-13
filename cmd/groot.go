@@ -23,6 +23,9 @@ import (
 
 	"os/user"
 
+	// Load all known auth plugins
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+
 	// "github.com/ameydev/groot/ksearch"
 	"github.com/ameydev/groot/kmap"
 	homedir "github.com/mitchellh/go-homedir"
