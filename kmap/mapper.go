@@ -141,7 +141,7 @@ func findPodChildren(pod *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 
 	for _, resource := range rPool.resources {
 
-		if resource.kind == "ConfigMap" || resource.kind == "Secret" || resource.kind == "PersistentVolumeClaim" && (resource.parent != nil) {
+		if resource.kind == "ConfigMap" || resource.kind == "Secret" || resource.kind == "PersistentVolumeClaim" {
 			for _, volume := range pod.spec.Volumes {
 				configMap := volume.VolumeSource.ConfigMap
 				if configMap != nil {
