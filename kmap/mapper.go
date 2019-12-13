@@ -12,7 +12,7 @@ import (
 
 var rPool *ResourcePool
 var groot *Resource
-var indentationCount int = 1
+var indentationCount int = 0
 var indentation string
 
 // var kinds = "Pods,ComponentStatuses,ConfigMaps,Endpoints,LimitRanges,Namespaces,PersistentVolumes,PersistentVolumeClaims,PodTemplates,ResourceQuotas,Secrets,Services,ServiceAccounts,DaemonSets,Deployments,ReplicaSets,StatefulSets"
@@ -114,28 +114,6 @@ func findNSChildren(groot *Resource, rPool *ResourcePool) *Resource {
 	return groot
 }
 
-func getIndentation(ind int) string {
-	indentation = ""
-	for i := 0; i < ind; i++ {
-		indentation += "\t"
-	}
-	// indentationCount += 1
-	return indentation
-}
-
-func printTree(groot *Resource) {
-
-	fmt.Println(getIndentation(indentationCount)+groot.kind, " - ", groot.name, " Status: ", groot.status)
-
-	if len(groot.children) > 0 {
-		indentationCount += 1
-		for _, child := range groot.children {
-			printTree(child)
-		}
-		indentationCount -= 1
-	}
-
-}
 func findPodChildren(pod *Resource, rPool *ResourcePool) (*Resource, *ResourcePool) {
 	// Pod children are supposed to be configMaps, secrets and volumeMounts
 
@@ -283,4 +261,33 @@ func findPVCChildren(pvc *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 	}
 
 	return pvc, rPool
+}
+
+func getTreeOutine() string {
+	return "|-------"
+}
+func getIndentation(ind int) string {
+	indentation = ""
+	for i := 0; i < ind; i++ {
+		indentation += "\t"
+	}
+	if indentationCount >= 1 {
+		indentation += getTreeOutine()
+	}
+
+	return indentation
+}
+
+func printTree(groot *Resource) {
+
+	fmt.Println(getIndentation(indentationCount)+groot.kind, " - ", groot.name, " Status: ", groot.status)
+
+	if len(groot.children) > 0 {
+		indentationCount += 1
+		for _, child := range groot.children {
+			printTree(child)
+		}
+		indentationCount -= 1
+	}
+
 }
