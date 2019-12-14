@@ -48,7 +48,6 @@ func mapThemAll(groot *Resource, rPool *ResourcePool) *Resource {
 	resources := rPool.resources
 	// fmt.Println("In Mapp")
 	for _, resource := range resources {
-		// resource.parent = groot
 		// fmt.Println(resource.kind, " - ", resource.name, " Status: ", resource.status)
 
 		if resource.kind == "Service" && resource.parent == nil {
@@ -122,15 +121,16 @@ func findPodChildren(pod *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 		if resource.kind == "ConfigMap" || resource.kind == "Secret" || resource.kind == "PersistentVolumeClaim" {
 			for _, volume := range pod.spec.Volumes {
 				configMap := volume.VolumeSource.ConfigMap
-				if configMap != nil {
+				if configMap != nil && !resource.hasParent {
 					if volume.VolumeSource.ConfigMap.LocalObjectReference.Name == resource.name {
 						pod.children = append(pod.children, resource)
 						resource.parent = pod
+						resource.hasParent = true
 						break
 					}
 				}
 				pvc := volume.VolumeSource.PersistentVolumeClaim
-				if pvc != nil {
+				if pvc != nil && !resource.hasParent {
 					if volume.VolumeSource.PersistentVolumeClaim.ClaimName == resource.name {
 						// pod.children = append(pod.children, resource)
 						// resource.parent = pod
@@ -138,16 +138,18 @@ func findPodChildren(pod *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 						pod.children = append(pod.children, resource)
 						resource.parent = pod
 						rPool = uPool
+						resource.hasParent = true
 						break
 
 					}
 				}
 				secret := volume.VolumeSource.Secret
-				if secret != nil {
+				if secret != nil && !resource.hasParent {
 					if volume.VolumeSource.Secret.SecretName == resource.name {
 						pod.children = append(pod.children, resource)
 						resource.parent = pod
 						break
+						resource.hasParent = true
 					}
 				}
 			}
@@ -161,29 +163,51 @@ func findPodChildren(pod *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 func findDeployChildren(deploy *Resource, rPool *ResourcePool) (*Resource, *ResourcePool) {
 
 	for _, resource := range rPool.resources {
+		// var isMapped bool
 
-		if resource.kind == "Replicaset" {
+		if resource.kind == "Replicaset" || resource.kind == "PodTemplate" {
 			// fmt.Faddf(w, "%v\t%v\t%v\t%v\t%v\n", deployment.Name, deployment.Status.ReadyReplicas, "", deployment.Status.AvailableReplicas, "")
 			selector := deploy.selector
-			if selector != nil {
+			if selector != nil && !resource.hasParent {
 				// filterPodsWithLabel(pods, selector)
-				for key, val := range resource.Labels {
-					result, ok := selector[key]
-					if !ok {
-						continue
-					}
-					if result == val {
-						resource, uPool := findRSChildren(resource, rPool)
-						deploy.children = append(deploy.children, resource)
-						resource.parent = deploy
-						rPool = uPool
+				if resource.Labels != nil {
+					for key, val := range resource.Labels {
+						result, ok := selector[key]
+						if !ok {
+							continue
+						}
+						if result == val {
+							resource, uPool := findRSChildren(resource, rPool)
+							deploy.children = append(deploy.children, resource)
+							resource.parent = deploy
+							rPool = uPool
+							resource.hasParent = true
+							break
 
+						}
+					}
+				}
+				if !resource.hasParent {
+					for key, val := range resource.selector {
+						result, ok := selector[key]
+						if !ok {
+							continue
+						}
+						if result == val {
+							resource, uPool := findRSChildren(resource, rPool)
+							deploy.children = append(deploy.children, resource)
+							resource.parent = deploy
+							rPool = uPool
+							break
+						}
 					}
 				}
 
 			}
+
 		}
 	}
+
 	return deploy, rPool
 }
 
@@ -193,17 +217,37 @@ func findServiceChildren(service *Resource, rPool *ResourcePool) (*Resource, *Re
 
 		if resource.kind == "Deployment" || resource.kind == "Endpoint" {
 			selector := service.selector
-			if selector != nil {
-				for key, val := range resource.Labels {
-					result, ok := selector[key]
-					if !ok {
-						continue
+			if selector != nil && !resource.hasParent {
+				if resource.Labels != nil {
+					for key, val := range resource.Labels {
+						result, ok := selector[key]
+						if !ok {
+							continue
+						}
+						if result == val {
+							resource, uPool := findDeployChildren(resource, rPool)
+							service.children = append(service.children, resource)
+							resource.parent = service
+							rPool = uPool
+							resource.hasParent = true
+							break
+						}
 					}
-					if result == val {
-						resource, uPool := findDeployChildren(resource, rPool)
-						service.children = append(service.children, resource)
-						resource.parent = service
-						rPool = uPool
+				}
+				if resource.selector != nil && !resource.hasParent {
+					for key, val := range resource.selector {
+						result, ok := selector[key]
+						if !ok {
+							continue
+						}
+						if result == val {
+							resource, uPool := findDeployChildren(resource, rPool)
+							service.children = append(service.children, resource)
+							resource.parent = service
+							rPool = uPool
+							resource.hasParent = true
+							break
+						}
 					}
 				}
 
@@ -217,7 +261,7 @@ func findRSChildren(rs *Resource, rPool *ResourcePool) (*Resource, *ResourcePool
 
 	for _, resource := range rPool.resources {
 
-		if resource.kind == "Pod" {
+		if resource.kind == "Pod" && !resource.hasParent {
 			// fmt.Faddf(w, "%v\t%v\t%v\t%v\t%v\n", deployment.Name, deployment.Status.ReadyReplicas, "", deployment.Status.AvailableReplicas, "")
 			selector := rs.selector
 			if selector != nil {
@@ -232,6 +276,7 @@ func findRSChildren(rs *Resource, rPool *ResourcePool) (*Resource, *ResourcePool
 						rs.children = append(rs.children, resource)
 						resource.parent = rs
 						rPool = uPool
+						resource.hasParent = true
 						break
 
 					}
@@ -247,12 +292,13 @@ func findPVCChildren(pvc *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 
 	for _, resource := range rPool.resources {
 
-		if resource.kind == "PersistentVolume" {
+		if resource.kind == "PersistentVolume" && !resource.hasParent {
 
 			if pvc.info["Volume"] == resource.name {
 				// resource, uPool := findPodChildren(resource, rPool)
 				pvc.children = append(pvc.children, resource)
 				resource.parent = pvc
+				resource.hasParent = true
 				break
 				// rPool = uPool
 

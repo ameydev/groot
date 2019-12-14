@@ -485,7 +485,9 @@ func addDeployments(deployments *appsv1.DeploymentList, rPool *ResourcePool) *Re
 			var blankResource Resource
 			blankResource.name = deployment.Name
 			blankResource.kind = "Deployment"
-			blankResource.status = string(deployment.Status.ReadyReplicas) + "/" + string(deployment.Status.AvailableReplicas)
+			var readyReplica int32 = deployment.Status.ReadyReplicas
+			var availableReplica int32 = deployment.Status.AvailableReplicas
+			blankResource.status = Int32toString(readyReplica) + "/" + Int32toString(availableReplica)
 			blankResource.Labels = deployment.Labels
 			blankResource.selector = deployment.Spec.Selector.MatchLabels
 			// blankResource.ownerReference = configMap.OwnerReferences
@@ -530,7 +532,7 @@ func addStateFulSets(ssets *appsv1.StatefulSetList, rPool *ResourcePool) *Resour
 			var blankResource Resource
 			blankResource.name = sset.Name
 			blankResource.kind = "StatefulSet"
-			blankResource.status = string(sset.Status.ReadyReplicas) + "/" + string(sset.Status.CurrentReplicas)
+			blankResource.status = Int32toString(sset.Status.ReadyReplicas) + "/" + Int32toString(sset.Status.CurrentReplicas)
 			blankResource.Labels = sset.Labels
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
@@ -581,3 +583,24 @@ func addStateFulSets(ssets *appsv1.StatefulSetList, rPool *ResourcePool) *Resour
 // 		}
 // 	}
 // }
+
+func Int32toString(n int32) string {
+	buf := [11]byte{}
+	pos := len(buf)
+	i := int64(n)
+	signed := i < 0
+	if signed {
+		i = -i
+	}
+	for {
+		pos--
+		buf[pos], i = '0'+byte(i%10), i/10
+		if i == 0 {
+			if signed {
+				pos--
+				buf[pos] = '-'
+			}
+			return string(buf[pos:])
+		}
+	}
+}
