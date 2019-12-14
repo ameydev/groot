@@ -71,6 +71,14 @@ func mapThemAll(groot *Resource, rPool *ResourcePool) *Resource {
 			rPool = uPool
 
 		}
+		if resource.kind == "StatefulSet" && resource.parent == nil {
+			pvcGroot, uPool := findStatefulSetChildren(resource, rPool)
+			groot.children = append(groot.children, pvcGroot)
+			resource.parent = groot
+			rPool = uPool
+
+		}
+
 		if resource.kind == "Pod" && resource.parent == nil {
 			podGroot, uPool := findPodChildren(resource, rPool)
 			groot.children = append(groot.children, podGroot)
@@ -209,6 +217,57 @@ func findDeployChildren(deploy *Resource, rPool *ResourcePool) (*Resource, *Reso
 	}
 
 	return deploy, rPool
+}
+
+func findStatefulSetChildren(StatefulSet *Resource, rPool *ResourcePool) (*Resource, *ResourcePool) {
+
+	for _, resource := range rPool.resources {
+		// var isMapped bool
+
+		if resource.kind == "Replicaset" || resource.kind == "PodTemplate" {
+			// fmt.Faddf(w, "%v\t%v\t%v\t%v\t%v\n", deployment.Name, deployment.Status.ReadyReplicas, "", deployment.Status.AvailableReplicas, "")
+			selector := StatefulSet.selector
+			if selector != nil && !resource.hasParent {
+				// filterPodsWithLabel(pods, selector)
+				if resource.Labels != nil {
+					for key, val := range resource.Labels {
+						result, ok := selector[key]
+						if !ok {
+							continue
+						}
+						if result == val {
+							resource, uPool := findRSChildren(resource, rPool)
+							StatefulSet.children = append(StatefulSet.children, resource)
+							resource.parent = StatefulSet
+							rPool = uPool
+							resource.hasParent = true
+							break
+
+						}
+					}
+				}
+				if !resource.hasParent {
+					for key, val := range resource.selector {
+						result, ok := selector[key]
+						if !ok {
+							continue
+						}
+						if result == val {
+							resource, uPool := findRSChildren(resource, rPool)
+							StatefulSet.children = append(StatefulSet.children, resource)
+							resource.parent = StatefulSet
+							rPool = uPool
+							break
+						}
+					}
+				}
+
+			}
+
+		}
+	}
+
+	return StatefulSet, rPool
 }
 
 func findServiceChildren(service *Resource, rPool *ResourcePool) (*Resource, *ResourcePool) {
