@@ -7,7 +7,7 @@ It will print the following information about the resource queried:
 eg:
 
 ```
-$ ktree -n dev
+$ groot -n dev
 
 service: frontend (status:ok)
 - deployment (status:ok)
