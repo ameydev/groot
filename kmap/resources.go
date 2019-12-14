@@ -534,6 +534,8 @@ func addStateFulSets(ssets *appsv1.StatefulSetList, rPool *ResourcePool) *Resour
 			blankResource.kind = "StatefulSet"
 			blankResource.status = Int32toString(sset.Status.ReadyReplicas) + "/" + Int32toString(sset.Status.CurrentReplicas)
 			blankResource.Labels = sset.Labels
+			blankResource.selector = sset.Spec.Selector.MatchLabels
+
 			// blankResource.ownerReference = configMap.OwnerReferences
 			rPool.addToResourcePool(&blankResource)
 		}

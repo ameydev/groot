@@ -72,8 +72,8 @@ func mapThemAll(groot *Resource, rPool *ResourcePool) *Resource {
 
 		}
 		if resource.kind == "StatefulSet" && resource.parent == nil {
-			pvcGroot, uPool := findStatefulSetChildren(resource, rPool)
-			groot.children = append(groot.children, pvcGroot)
+			stsgroot, uPool := findStatefulSetChildren(resource, rPool)
+			groot.children = append(groot.children, stsgroot)
 			resource.parent = groot
 			rPool = uPool
 
@@ -224,7 +224,7 @@ func findStatefulSetChildren(StatefulSet *Resource, rPool *ResourcePool) (*Resou
 	for _, resource := range rPool.resources {
 		// var isMapped bool
 
-		if resource.kind == "Replicaset" || resource.kind == "PodTemplate" {
+		if resource.kind == "Pod" || resource.kind == "PodTemplate" {
 			// fmt.Faddf(w, "%v\t%v\t%v\t%v\t%v\n", deployment.Name, deployment.Status.ReadyReplicas, "", deployment.Status.AvailableReplicas, "")
 			selector := StatefulSet.selector
 			if selector != nil && !resource.hasParent {
@@ -236,7 +236,7 @@ func findStatefulSetChildren(StatefulSet *Resource, rPool *ResourcePool) (*Resou
 							continue
 						}
 						if result == val {
-							resource, uPool := findRSChildren(resource, rPool)
+							resource, uPool := findPodChildren(resource, rPool)
 							StatefulSet.children = append(StatefulSet.children, resource)
 							resource.parent = StatefulSet
 							rPool = uPool
