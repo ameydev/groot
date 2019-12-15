@@ -5,8 +5,6 @@ import (
 
 	"github.com/infracloudio/ksearch/pkg/util"
 
-	// "github.com/ameydev/groot/printer"
-
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -14,8 +12,6 @@ var rPool *ResourcePool
 var groot *Resource
 var indentationCount int = 0
 var indentation string
-
-// var kinds = "Pods,ComponentStatuses,ConfigMaps,Endpoints,LimitRanges,Namespaces,PersistentVolumes,PersistentVolumeClaims,PodTemplates,ResourceQuotas,Secrets,Services,ServiceAccounts,DaemonSets,Deployments,ReplicaSets,StatefulSets"
 
 func FindThemAll(clientset *kubernetes.Clientset, namespace *string) error {
 	// var kinds = "Pods,ComponentStatuses,ConfigMaps,Endpoints,LimitRanges,Namespaces,PersistentVolumes,PersistentVolumeClaims,PodTemplates,ResourceQuotas,Secrets,Services,ServiceAccounts,DaemonSets,Deployments,ReplicaSets,StatefulSets"
@@ -29,13 +25,10 @@ func FindThemAll(clientset *kubernetes.Clientset, namespace *string) error {
 	for {
 		resource, ok := <-getter
 		if !ok {
-			// fmt.Print("domee", resource)
-			// return nil
 			break
 		}
 
 		rPool = convertResource(resource, rPool)
-		// fmt.Print("Resource", resource)
 
 	}
 	groot = resourceNamespace
@@ -46,7 +39,6 @@ func FindThemAll(clientset *kubernetes.Clientset, namespace *string) error {
 
 func mapThemAll(groot *Resource, rPool *ResourcePool) *Resource {
 	resources := rPool.resources
-	// fmt.Println("In Mapp")
 	for _, resource := range resources {
 		// fmt.Println(resource.kind, " - ", resource.name, " Status: ", resource.status)
 
@@ -98,18 +90,12 @@ func mapThemAll(groot *Resource, rPool *ResourcePool) *Resource {
 			resource.parent = groot
 
 		} else {
-			// fmt.Println("The reource was namespace")
 			continue
 		}
 
 	}
 	return groot
 }
-
-// func getServiceGroot(serviceResource *Resource, rPool *ResourcePool) {
-
-// 	return resource, &rPool
-// }
 
 func findNSChildren(groot *Resource, rPool *ResourcePool) *Resource {
 	for _, resource := range rPool.resources {
@@ -156,8 +142,8 @@ func findPodChildren(pod *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 					if volume.VolumeSource.Secret.SecretName == resource.name {
 						pod.children = append(pod.children, resource)
 						resource.parent = pod
-						break
 						resource.hasParent = true
+						break
 					}
 				}
 			}
@@ -222,13 +208,10 @@ func findDeployChildren(deploy *Resource, rPool *ResourcePool) (*Resource, *Reso
 func findStatefulSetChildren(StatefulSet *Resource, rPool *ResourcePool) (*Resource, *ResourcePool) {
 
 	for _, resource := range rPool.resources {
-		// var isMapped bool
 
 		if resource.kind == "Pod" || resource.kind == "PodTemplate" {
-			// fmt.Faddf(w, "%v\t%v\t%v\t%v\t%v\n", deployment.Name, deployment.Status.ReadyReplicas, "", deployment.Status.AvailableReplicas, "")
 			selector := StatefulSet.selector
 			if selector != nil && !resource.hasParent {
-				// filterPodsWithLabel(pods, selector)
 				if resource.Labels != nil {
 					for key, val := range resource.Labels {
 						result, ok := selector[key]
@@ -321,10 +304,8 @@ func findRSChildren(rs *Resource, rPool *ResourcePool) (*Resource, *ResourcePool
 	for _, resource := range rPool.resources {
 
 		if resource.kind == "Pod" && !resource.hasParent {
-			// fmt.Faddf(w, "%v\t%v\t%v\t%v\t%v\n", deployment.Name, deployment.Status.ReadyReplicas, "", deployment.Status.AvailableReplicas, "")
 			selector := rs.selector
 			if selector != nil {
-				// filterPodsWithLabel(pods, selector)
 				for key, val := range resource.Labels {
 					result, ok := selector[key]
 					if !ok {
