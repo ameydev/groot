@@ -61,8 +61,9 @@ func groot() *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:   "groot",
-		Short: "groot is a k8s helper CLI utility tool.",
+		Use:     "groot",
+		Version: "\nI am baby Groot - v0.0.1",
+		Short:   "groot is a k8s helper CLI utility tool.",
 		Long: `This tool is used to find k8s resourses and their mappings with other k8s reources. For example:
 		  
 		groot -n $namespace.`,
@@ -123,7 +124,7 @@ func getOverView(c *configs) error {
 		return err
 	}
 
-	fmt.Println("Namespace : " + c.Namespace + " \n ")
+	// fmt.Println("Namespace : " + c.Namespace + " \n ")
 	// ksearch.SearchResources(clientset, &c.Namespace)
 	kmap.FindThemAll(clientset, &c.Namespace)
 
