@@ -385,7 +385,15 @@ func getIndentation(ind int) string {
 
 func printTree(groot *Resource) {
 
-	fmt.Println(getIndentation(indentationCount)+groot.kind, " - ", groot.name, " Status: ", groot.status)
+	if groot.kind == "Event" {
+		if groot.info["Type"] != "Normal" {
+			fmt.Println(getIndentation(indentationCount)+groot.kind, " - Type - ", groot.info["Type"], "\t Reason - ", groot.info["Reason"], "\t ObjectKind/Name - (", groot.info["ObjectKind"], "/", groot.info["ObjectName"], ")")
+			fmt.Println(getIndentation(indentationCount)+"*** Message *** ", groot.info["Message"])
+		}
+
+	} else {
+		fmt.Println(getIndentation(indentationCount)+groot.kind, " - ", groot.name, " Status: ", groot.status)
+	}
 
 	if len(groot.children) > 0 {
 		indentationCount += 1

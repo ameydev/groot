@@ -250,8 +250,14 @@ func addEvents(events *v1.EventList, rPool *ResourcePool) *ResourcePool {
 			blankResource.name = event.Name
 			blankResource.kind = "Event"
 			// blankResource.status = string(configMap.s)
-			blankResource.Labels = event.Labels
-			// blankResource.ownerReference = configMap.OwnerReferences
+			// blankResource.Labels = event.Labels
+			var data = map[string]string{}
+			data["Type"] = event.Type
+			data["ObjectKind"] = event.InvolvedObject.Kind
+			data["ObjectName"] = event.InvolvedObject.Name
+			data["Message"] = event.Message
+			data["Reason"] = event.Reason
+			blankResource.info = data
 			rPool.addToResourcePool(&blankResource)
 		}
 
