@@ -13,8 +13,8 @@ var groot *Resource
 var indentationCount int = 0
 var indentation string
 
+// this function will fetch namespaced resources lists from ksearch
 func FindThemAll(clientset *kubernetes.Clientset, namespace *string) error {
-	// var kinds = "Pods,ComponentStatuses,ConfigMaps,Endpoints,LimitRanges,Namespaces,PersistentVolumes,PersistentVolumeClaims,PodTemplates,ResourceQuotas,Secrets,Services,ServiceAccounts,DaemonSets,Deployments,ReplicaSets,StatefulSets"
 	var kinds = "Services,Endpoints,Deployments,ReplicaSets,StatefulSets,PodTemplates,Pods,ConfigMaps,PersistentVolumeClaims,PersistentVolumes,Secrets,ServiceAccounts,DaemonSets"
 
 	getter := make(chan interface{})
@@ -40,7 +40,6 @@ func FindThemAll(clientset *kubernetes.Clientset, namespace *string) error {
 func mapThemAll(groot *Resource, rPool *ResourcePool) *Resource {
 	resources := rPool.resources
 	for _, resource := range resources {
-		// fmt.Println(resource.kind, " - ", resource.name, " Status: ", resource.status)
 
 		if resource.kind == "Service" && resource.parent == nil {
 			serviceGroot, uPool := findServiceChildren(resource, rPool)
@@ -126,8 +125,6 @@ func findPodChildren(pod *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 				pvc := volume.VolumeSource.PersistentVolumeClaim
 				if pvc != nil && !resource.hasParent {
 					if volume.VolumeSource.PersistentVolumeClaim.ClaimName == resource.name {
-						// pod.children = append(pod.children, resource)
-						// resource.parent = pod
 						resource, uPool := findPVCChildren(resource, rPool)
 						pod.children = append(pod.children, resource)
 						resource.parent = pod
@@ -150,7 +147,7 @@ func findPodChildren(pod *Resource, rPool *ResourcePool) (*Resource, *ResourcePo
 
 		}
 	}
-	// groot.children = append(groot.children, pod)
+
 	return pod, rPool
 }
 

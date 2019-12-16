@@ -23,10 +23,8 @@ import (
 
 	"os/user"
 
-	// Load all known auth plugins
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	// "github.com/ameydev/groot/ksearch"
 	"github.com/ameydev/groot/kmap"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -35,8 +33,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
-
-// var cfgFile string
 
 var indentationCount int = 1
 var indentation string
@@ -124,8 +120,6 @@ func getOverView(c *configs) error {
 		return err
 	}
 
-	// fmt.Println("Namespace : " + c.Namespace + " \n ")
-	// ksearch.SearchResources(clientset, &c.Namespace)
 	kmap.FindThemAll(clientset, &c.Namespace)
 
 	return nil
