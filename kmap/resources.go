@@ -26,9 +26,7 @@ type ResourcePool struct {
 }
 
 func (r *ResourcePool) addToResourcePool(resource *Resource) {
-
 	r.resources = append(r.resources, resource)
-	// return pool
 }
 
 func convertResource(resource interface{}, rPool *ResourcePool) *ResourcePool {
@@ -117,7 +115,6 @@ func addPodTemplates(podTemplates *v1.PodTemplateList, rPool *ResourcePool) *Res
 			podTemplateResource.name = podTemplate.Name
 			podTemplateResource.kind = "PodTemplate"
 			podTemplateResource.Labels = podTemplate.Labels
-
 			rPool.addToResourcePool(&podTemplateResource)
 
 		}
@@ -132,7 +129,6 @@ func addComponentStatuses(componentStatuses *v1.ComponentStatusList, rPool *Reso
 			podTemplateResource.name = componentStatus.Name
 			podTemplateResource.kind = "ComponentStatus"
 			podTemplateResource.Labels = componentStatus.Labels
-
 			rPool.addToResourcePool(&podTemplateResource)
 
 		}
@@ -148,7 +144,6 @@ func addConfigMaps(cms *v1.ConfigMapList, rPool *ResourcePool) *ResourcePool {
 			blankResource.kind = "ConfigMap"
 			blankResource.Labels = configMap.Labels
 			rPool.addToResourcePool(&blankResource)
-
 		}
 	}
 	return rPool
@@ -225,7 +220,6 @@ func addPVs(pvs *v1.PersistentVolumeList, rPool *ResourcePool) *ResourcePool {
 			blankResource.kind = "PersistentVolume"
 			blankResource.status = string(pv.Status.Phase)
 			blankResource.Labels = pv.Labels
-
 			rPool.addToResourcePool(&blankResource)
 		}
 
