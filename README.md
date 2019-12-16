@@ -1,5 +1,13 @@
-# groot
+# Ktree A.K.A. Groot
 kubernetes helper tool for finding out status of a kubernetes resource with their respective linked resources in a cluster.
+
+# Tree Structured Map of K8S resources:
+With just one `groot` command we can find the current relational mapping of the `k8s` resources deployed in a particular namespace.
+
+
+# Troubleshoot the namespace:
+Tired of firing ` kubectl get/describe pod/deploy/svc` commands just to know status of your deployments? why not just `groot` it! :) To see `status` of your `deployments` and `pods`(and rest of the resources as well, Soon.)
+
 
 It will print the following information about the resource queried:
   - Status of the resource
@@ -7,18 +15,49 @@ It will print the following information about the resource queried:
 eg:
 
 ```
-$ ktree -n dev
+$ groot --namespace sock-shop
 
-service: frontend (status:ok)
-- deployment (status:ok)
-    - 3 pods (status:ok)
-       --  configmap-1 (status:ok)
-       --  volume 1 (status:ok)
-
-service: backend (status:some error with volume-1)
-- deployment 
-    - 5 pods (status:ok)
-       --  configmap-1 (status:ok)
-       -- volume -1 ( status: some error )
-       --> label matched with DB
+Namespace  -  sock-shop  Status:  
+	|-------Service  -  carts  Status:  
+		|-------Endpoint  -  carts  Status:  
+		|-------Deployment  -  carts  Status:  1/1
+			|-------Replicaset  -  carts-54d97c56b6  Status:  
+				|-------Pod  -  carts-54d97c56b6-ngfhj  Status:  Running
+					|-------Secret  -  default-token-qcjmp  Status:  
+	|-------Service  -  carts-db  Status:  
+		|-------Endpoint  -  carts-db  Status:  
+		|-------Deployment  -  carts-db  Status:  2/2
+			|-------Replicaset  -  carts-db-5678cc578f  Status:  
+				|-------Pod  -  carts-db-5678cc578f-6jp5w  Status:  Running
+					|-------Secret  -  default-token-qcjmp  Status:  
+				|-------Pod  -  carts-db-5678cc578f-g7t5r  Status:  Running
+					|-------Secret  -  default-token-qcjmp  Status:  
 ```
+
+# Credits to ksearch:
+The `groot` uses `ksearch` to get the list of k8s resources. `ksearch` is a kubectl plugin that will help us list all (literally all) the resources in a namespace and the resources can be searched using names as well.
+Know more about `ksearch` (https://github.com/infracloudio/ksearch) 
+
+
+# Installation 
+1. Clone the repo in your $GOPATH
+```
+git clone https://github.com/ameydev/groot.git
+
+```
+2. Build the groot
+```
+cd groot && go build
+
+```
+3. Copy to `bin/`
+```
+sudo cp groot /usr/local/bin/
+
+```
+
+# Contributions:
+
+Contributions and suggestions are always welcome. Feel free to fork the repo or file issue.
+
+
