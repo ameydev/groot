@@ -13,7 +13,7 @@ var groot *Resource
 var indentationCount int = 0
 var indentation string
 
-// this function will fetch namespaced resources lists from ksearch
+// FindThemAll will fetch namespaced resources lists from ksearch
 func FindThemAll(clientset *kubernetes.Clientset, namespace *string) error {
 	var kinds = "Services,Endpoints,Deployments,ReplicaSets,StatefulSets,PodTemplates,Pods,ConfigMaps,PersistentVolumeClaims,PersistentVolumes,Secrets,ServiceAccounts,DaemonSets"
 
