@@ -41,21 +41,28 @@ Know more about `ksearch` (https://github.com/infracloudio/ksearch)
 
 
 # Installation 
-1. Clone the repo in your $GOPATH
+
+1. Download the CLI
 ```
-git clone https://github.com/ameydev/groot.git
+curl -LO https://github.com/ameydev/groot/releases/download/v0.0.1/groot
 
 ```
-2. Build the groot
+2. Make the binary executable
 ```
-cd groot && go build
+chmod +x ./groot
 
 ```
-3. Copy to `bin/`
+3. Move the binary in to your `PATH`.
 ```
-sudo cp groot /usr/local/bin/
+sudo mv ./groot /usr/local/bin/groot
 
 ```
+4. Test to ensure the version
+```
+groot --version
+
+```
+
 
 # Contributions:
 
