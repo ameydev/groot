@@ -6,7 +6,8 @@ With just one `groot` command we can find the current relational mapping of the 
 
 
 # Troubleshoot the namespace:
-Tired of firing ` kubectl get/describe pod/deploy/svc` commands just to know status of your deployments? why not just `groot` it! :) To see `status` of your `deployments` and `pods`(and rest of the resources as well, Soon.)
+Tired of firing ` kubectl get/describe pod/deploy/svc` commands just to know status of your deployments? why not just `groot` it! :) To see `status` of your `Services`, `deployments` and `pods`(and rest of the resources as well, Soon.)
+We can even check if some `Configmap` or `Secrets` are not mapped with any `Pods` or not.
 
 
 It will print the following information about the resource queried:
@@ -59,5 +60,3 @@ sudo cp groot /usr/local/bin/
 # Contributions:
 
 Contributions and suggestions are always welcome. Feel free to fork the repo or file issue.
-
-
