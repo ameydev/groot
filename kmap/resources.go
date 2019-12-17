@@ -99,7 +99,15 @@ func addPodDetails(pods *v1.PodList, rPool *ResourcePool) *ResourcePool {
 			var podResource Resource
 			podResource.name = pod.Name
 			podResource.kind = "Pod"
-			podResource.status = string(pod.Status.Phase)
+			podResource.status = "Not Running"
+			if string(pod.Status.Phase) == "Running" {
+				for _, containerStatus := range pod.Status.ContainerStatuses {
+					if containerStatus.State.Running != nil {
+						podResource.status = "Running"
+					}
+
+				}
+			}
 			podResource.Labels = pod.Labels
 			podResource.spec = pod.Spec
 			rPool.addToResourcePool(&podResource)
