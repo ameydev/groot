@@ -2,6 +2,7 @@ package kmap
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracloudio/ksearch/pkg/util"
 
@@ -369,6 +370,22 @@ func printTree(groot *Resource) {
 			fmt.Println(getIndentation(indentationCount)+"*** Message *** ", groot.info["Message"])
 		}
 
+	}
+
+	if groot.kind == "Service" {
+		serviceStatus := getServiceStatus(groot)
+		groot.status = serviceStatus
+	}
+	if groot.kind == "ServiceAccount" {
+		fmt.Println(getIndentation(indentationCount)+groot.kind, " - ", groot.name)
+	} else if groot.kind == "ConfigMap" || groot.kind == "Secret" {
+
+		if groot.parent.kind == "Namespace" {
+			fmt.Println(getIndentation(indentationCount)+groot.kind, " - ", groot.name, " Status: StandAlone")
+		} else {
+			fmt.Println(getIndentation(indentationCount)+groot.kind, " - ", groot.name)
+		}
+
 	} else {
 		fmt.Println(getIndentation(indentationCount)+groot.kind, " - ", groot.name, " Status: ", groot.status)
 	}
@@ -381,4 +398,24 @@ func printTree(groot *Resource) {
 		indentationCount -= 1
 	}
 
+}
+
+func getServiceStatus(serviceResource *Resource) string {
+	var status string = "unknown"
+
+	if len(groot.children) > 0 {
+
+		for _, child := range groot.children {
+			if child.kind == "Deployment" {
+				Replicas := strings.Split(child.status, "/")
+				if Replicas[0] == Replicas[1] && (Replicas[1] != "0" || Replicas[0] != "0") {
+					status = "Ready"
+				}
+
+			}
+
+		}
+
+	}
+	return status
 }
