@@ -35,6 +35,9 @@ Namespace  -  sock-shop  Status:
 					|-------Secret  -  default-token-qcjmp  Status:  
 ```
 
+<link rel="alternate" type="application/x-asciicast" href="static/tmpw5wcxug3-ascii.cast">
+
+
 # Credits to ksearch:
 The `groot` uses `ksearch` to get the list of k8s resources. `ksearch` is a kubectl plugin that will help us list all (literally all) the resources in a namespace and the resources can be searched using names as well.
 Know more about `ksearch` (https://github.com/infracloudio/ksearch) 

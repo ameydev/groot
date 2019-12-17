@@ -1,0 +1,12 @@
+{"version": 2, "width": 142, "height": 36, "timestamp": 1576587647, "env": {"SHELL": "/bin/bash", "TERM": "xterm-256color"}}
+[0.246307, "o", "\u001b]0;amey@amey-ThinkPad-E480: ~\u0007\u001b[01;32mamey@amey-ThinkPad-E480\u001b[00m:\u001b[01;34m~\u001b[01;31m\u001b[00m$ "]
+[1.523953, "o", "g"]
+[1.668196, "o", "r"]
+[1.962915, "o", "o"]
+[2.157257, "o", "o"]
+[2.460172, "o", "t "]
+[5.028692, "o", "\r\n"]
+[5.131693, "o", "Namespace  -  default  Status:  \r\n\t|-------Service  -  front-end  Status:  Ready\r\n\t\t|-------Endpoint  -  front-end  Status:  \r\n\t|-------Service  -  kubernetes  Status:  Ready\r\n\t|-------Endpoint  -  kubernetes  Status:  \r\n\t|-------Deployment  -  nginx2  Status:  1/1\r\n\t\t|-------Replicaset  -  nginx2-56b65ddfb6  Status:  \r\n\t\t\t|-------Pod  -  nginx2-76cb67f86b-v47vs  Status:  Running\r\n\t\t\t\t|-------Secret  -  default-token-7bbgw\r\n\t\t|-------Replicaset  -  nginx2-76cb67f86b  Status:  \r\n"]
+[5.131852, "o", "\t\t|-------Replicaset  -  nginx2-94b8859b6  Status:  \r\n\t|-------Deployment  -  nt  Status:  0/0\r\n\t\t|-------Replicaset  -  nt-7f54fd4c6  Status:  \r\n\t\t\t|-------Pod  -  nt-7f54fd4c6-7wfjq  Status:  Not Running\r\n\t|-------Pod  -  redis  Status:  Not Running\r\n\t|-------Pod  -  task-pv-pod  Status:  Running\r\n\t\t|-------PersistentVolumeClaim  -  task-pv-claim  Status:  Bound\r\n\t\t\t|-------PersistentVolume  -  task-pv-volume  Status:  Bound\r\n\t|-------ConfigMap  -  example-redis-config-dgh9dg555m  Status: StandAlone\r\n\t|-------PersistentVolumeClaim  -  mysqlvol  Status:  Bound\r\n\t\t|-------PersistentVolume  -  mysqlvol  Status:  Bound\r\n\t|-------Secret  -  workload-generator-sa-token-84cct  Status: StandAlone\r\n\t|-------ServiceAccount  -  default\r\n\t|-------ServiceAccount  -  workload-generator-sa\r\n"]
+[5.134985, "o", "\u001b]0;amey@amey-ThinkPad-E480: ~\u0007\u001b[01;32mamey@amey-ThinkPad-E480\u001b[00m:\u001b[01;34m~\u001b[01;31m\u001b[00m$ "]
+[7.701724, "o", "exit\r\n"]
