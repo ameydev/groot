@@ -1,3 +1,11 @@
+# Arhcive Alert
+
+This repo is not been in use and marked as archived. This is because [Ahmet](https://twitter.com/ahmetb) (who has also developed the kubectl plugin distribution system [krew](https://krew.sigs.k8s.io/plugins/)) created a similar tool called [kubectl-tree](https://github.com/ahmetb/kubectl-tree) as a `kubectl` plugin. I had already started working on the `groot` project and even published the release ([v0.0.1](https://github.com/ameydev/groot/releases/tag/v0.0.1)) but as per Ahmet's [suggestion](https://twitter.com/ahmetb/status/1209738603699429378), I stopped working on this project as the `tree` plugin received great traction from the very beggining of its launch.
+
+
+![Ahemt's response](groot-vs-tree.jpg?raw=true "Groot response by Ahmet")
+
+
 # Ktree A.K.A. Groot
 kubernetes helper tool for finding out status of a kubernetes resource with their respective linked resources in a cluster.
 
